@@ -168,7 +168,7 @@ pids_to_clio_ids_to_sync.each do |pid, clio_id|
     next
   end
 
-	puts "#{pid} updated successfully" if debug
+	puts "#{pid} updated successfully" + (publish_during_save ? ' AND published' : '') if debug
 end
 
 puts 'Done!' if debug
