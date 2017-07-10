@@ -41,7 +41,14 @@ hyacinth_publish_target_clio_sync.rb [OPTIONS]
 	end
 end
 
-config = YAML::load_file(File.join(__dir__, 'config.yml'))
+config_file_path = File.join(__dir__, 'config.yml')
+
+unless File.exists?(config_file_path)
+  puts 'Error: Missing required config file: config.yml'
+  exit
+end
+
+config = YAML::load_file(config_file_path)
 # Note: Base64.encode64 method can include newline characters, which messes things up.  That's why we're using Base64.strict_encode64 instead.
 hyacinth_basic_auth_token = Base64.strict_encode64(config['hyacinth_email'] + ':' + config['hyacinth_password'])
 
