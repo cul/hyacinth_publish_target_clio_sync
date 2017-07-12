@@ -13,10 +13,12 @@ require 'marc'
 
 debug = false
 publish_during_save = false
+first_record_only = false
 
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--debug', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--first-only', GetoptLong::OPTIONAL_ARGUMENT ],
 	[ '--publish', GetoptLong::OPTIONAL_ARGUMENT ],
 )
 opts.each do |opt, arg|
@@ -31,11 +33,16 @@ hyacinth_publish_target_clio_sync.rb [OPTIONS]
 --debug:
    run in debug mode with additional output
 
+--first-only:
+      only update the first publish target. this option is generally used only during development/testing
+
 --publish:
    in addition to the default behavior of updating publish targets, also publish all updated publish targets
       EOF
 		when '--debug'
 			debug = true
+    when '--first-only'
+      first_record_only = true
 		when '--publish'
 			publish_during_save = true
 	end
@@ -106,7 +113,14 @@ end
 puts "Number of Publish Targets with CLIO IDs: #{pids_to_clio_ids_to_sync.length}" if debug
 
 # For each publish target with CLIO ID, get the MARC record for that CLIO ID from CLIO
+total_objects_to_update = pids_to_clio_ids_to_sync.length
+total_objects_updated = 0
 pids_to_clio_ids_to_sync.each do |pid, clio_id|
+  if first_record_only && total_objects_updated > 0
+    puts 'Notice: Skipping remaining Hyacinth object updates because --first-only argument was given.'
+    break
+  end
+
 	puts "--- Processing #{pid} (CLIO ID: #{clio_id}) ---" if debug
   begin
     marc_data_response = RestClient::Request.execute(
@@ -175,6 +189,7 @@ pids_to_clio_ids_to_sync.each do |pid, clio_id|
     next
   end
 
+  total_objects_updated += 1
 	puts "#{pid} updated successfully" + (publish_during_save ? ' AND published' : '') if debug
 end
 
