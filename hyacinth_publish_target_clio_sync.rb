@@ -151,15 +151,22 @@ pids_to_clio_ids_to_sync.each do |pid, clio_id|
   # Remove leading and trailing whitespace from title
   title = title.strip
 
-  # If the title begins with and ends with quotation marks, remove those quotation marks
-  title = title[1...(title.length-1)] if title.match(/^".+"$/)
-
 	# Remove certain trailing characters from the title, as well as whitespace leftover after their removal
 	title = title.gsub(/[\.\/,:]$/, '').strip
 	puts "Title after cleanup: #{title}" if debug
 
 	title_non_sort_portion = title[0...num_nonsort_characters]
 	title_sort_portion = title[num_nonsort_characters..-1]
+
+  # If the full title begins with and ends with quotation marks, remove those quotation marks from the sort and nonsort portions
+  if title.match(/^".+"$/)
+    if title_non_sort_portion.length > 0
+      title_non_sort_portion = title_non_sort_portion[1...(title_non_sort_portion.length)]
+    else
+      title_sort_portion = title_sort_portion[1...(title_sort_portion.length)]
+    end
+    title_sort_portion = title_sort_portion[0...(title_sort_portion.length-1)]
+  end
 
 	puts "Num nonsort chars: #{num_nonsort_characters}" if debug
 	puts "Title Non-Sort Portion: #{title_non_sort_portion}" if debug
