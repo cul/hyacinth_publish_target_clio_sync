@@ -143,6 +143,11 @@ pids_to_clio_ids_to_sync.each do |pid, clio_id|
 
   puts "Title before cleanup: #{title}" if debug
 
+  # Replace new line characters with spaces
+  title = title.gsub(/\n/, ' ')
+  # And replace multiple whitespace characters in a row with a single space
+  title = title.gsub(/\s\s+/, ' ');
+
   # Remove leading and trailing whitespace from title
   title = title.strip
 
