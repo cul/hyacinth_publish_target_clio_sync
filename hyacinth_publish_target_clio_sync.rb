@@ -141,7 +141,7 @@ pids_to_clio_ids_to_sync.each do |pid, clio_id|
 	title = marc_record['245']['a']
 	summary = marc_record['520']['a']
 
-  puts "Title before cleanup: #{title}" if debug
+  puts "Title 245 $a before cleanup: #{title}" if debug
 
   # Replace new line characters with spaces
   title = title.gsub(/\n/, ' ')
@@ -172,6 +172,16 @@ pids_to_clio_ids_to_sync.each do |pid, clio_id|
 	puts "Title Non-Sort Portion: #{title_non_sort_portion}" if debug
 	puts "Title Sort Portion: #{title_sort_portion}" if debug
 	puts "Summary: #{summary}" if debug
+
+  # If part title is present, append it to end of title_sort_portion
+  unless marc_record['245']['p'].nil?
+    title_sort_portion += ': ' + marc_record['245']['p'] unless marc_record['245']['p'].nil? # Add part title if present
+    if debug
+      puts '---'
+      puts 'Part title found.  Appending to title_sort_portion...'
+      puts "New title_sort_portion value: #{title_sort_portion}"
+    end
+  end
 
 	hyacinth_record_update_url = "https://hyacinth.library.columbia.edu/digital_objects/#{pid}.json"
 	put_params = {
