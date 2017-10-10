@@ -181,9 +181,11 @@ pids_to_clio_ids_to_sync.each do |pid, clio_id|
   # For some records, we want to pull 245 $b ("remainder of title") into the title too (because $a doesn't include all of our preferred keywords for search/display)
   if include_245b_for_clio_ids.include?(clio_id) && !marc_record['245']['b'].nil?
     title_sort_portion += ' : ' + marc_record['245']['b'].gsub(/[\.\/,:]$/, '').strip # Remove certain trailing characters from the end of the "remainder of title"
-    puts '---'
-    puts '245 $b title found.  Appending to title_sort_portion...'
-    puts "New title_sort_portion value: #{title_sort_portion}"
+    if debug
+      puts '---'
+      puts '245 $b title found.  Appending to title_sort_portion...'
+      puts "New title_sort_portion value: #{title_sort_portion}"
+    end
   end
 
   # If part title is present, append it to end of title_sort_portion
