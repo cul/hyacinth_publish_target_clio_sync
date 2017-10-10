@@ -11,6 +11,11 @@ require 'json'
 require 'getoptlong'
 require 'marc'
 
+# Specify CLIO IDs here for records we want to also include the 245 $b field
+include_245b_for_clio_ids = [
+  '9008767' # "The unwritten history": Alexander Gumby's African America
+]
+
 debug = false
 publish_during_save = false
 first_record_only = false
@@ -173,9 +178,17 @@ pids_to_clio_ids_to_sync.each do |pid, clio_id|
 	puts "Title Sort Portion: #{title_sort_portion}" if debug
 	puts "Summary: #{summary}" if debug
 
+  # For some records, we want to pull 245 $b ("remainder of title") into the title too (because $a doesn't include all of our preferred keywords for search/display)
+  if include_245b_for_clio_ids.include?(clio_id) && !marc_record['245']['b'].nil?
+    title_sort_portion += ' : ' + marc_record['245']['b'].gsub(/[\.\/,:]$/, '').strip # Remove certain trailing characters from the end of the "remainder of title"
+    puts '---'
+    puts '245 $b title found.  Appending to title_sort_portion...'
+    puts "New title_sort_portion value: #{title_sort_portion}"
+  end
+
   # If part title is present, append it to end of title_sort_portion
   unless marc_record['245']['p'].nil?
-    title_sort_portion += ': ' + marc_record['245']['p'] unless marc_record['245']['p'].nil? # Add part title if present
+    title_sort_portion += ': ' + marc_record['245']['p']
     if debug
       puts '---'
       puts 'Part title found.  Appending to title_sort_portion...'
