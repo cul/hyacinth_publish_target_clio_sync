@@ -44,6 +44,7 @@ hyacinth_publish_target_clio_sync.rb [OPTIONS]
 --publish:
    in addition to the default behavior of updating publish targets, also publish all updated publish targets
       EOF
+      exit
 		when '--debug'
 			debug = true
     when '--first-only'
@@ -105,7 +106,6 @@ search_result_json['results'].each do |hyacinth_search_result|
 	digital_object_data = JSON.parse(hyacinth_search_result['digital_object_data_ts'])
 	dynamic_field_data = digital_object_data['dynamic_field_data']
 
-	clio_identifier_field = dynamic_field_data.fetch('clio_identifier', [{}])
 	if dynamic_field_data['clio_identifier'].nil?
 		next # Skip this publish target because it has no associated CLIO record
 	elsif dynamic_field_data['clio_identifier'].length > 1
@@ -118,7 +118,6 @@ end
 puts "Number of Publish Targets with CLIO IDs: #{pids_to_clio_ids_to_sync.length}" if debug
 
 # For each publish target with CLIO ID, get the MARC record for that CLIO ID from CLIO
-total_objects_to_update = pids_to_clio_ids_to_sync.length
 total_objects_updated = 0
 pids_to_clio_ids_to_sync.each do |pid, clio_id|
   if first_record_only && total_objects_updated > 0
@@ -220,7 +219,7 @@ pids_to_clio_ids_to_sync.each do |pid, clio_id|
 		})
 	}
   begin
-    hyacinth_record_update_response = RestClient::Request.execute(
+    RestClient::Request.execute(
       method: :put,
       url: hyacinth_record_update_url,
       timeout: 120,
