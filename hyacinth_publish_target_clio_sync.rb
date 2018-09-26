@@ -205,7 +205,7 @@ if __FILE__ == $PROGRAM_NAME
         first_record_only = true
       when '--publish'
         publish_during_save = true
-      when '--slug'
+      when '--string_key'
         publish_target = arg
     end
   end
