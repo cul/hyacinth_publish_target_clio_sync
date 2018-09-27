@@ -295,7 +295,7 @@ if __FILE__ == $PROGRAM_NAME
     hyacinth_record_update_url = "https://hyacinth.library.columbia.edu/digital_objects/#{pid}.json"
     put_params = {
       publish: publish_during_save,
-      digital_object_data_json: marc_to_digital_object_data(marc_record, include_245b, debug)
+      digital_object_data_json: JSON.generate(marc_to_digital_object_data(marc_record, include_245b, debug))
     }
     begin
       RestClient::Request.execute(
