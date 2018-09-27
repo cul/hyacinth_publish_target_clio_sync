@@ -232,7 +232,7 @@ if __FILE__ == $PROGRAM_NAME
     }
   }
 
-  post_params[:search][:f][:publish_target_string_key_sim] = publish_target if publish_target
+  post_params[:search][:f][:publish_target_string_key_sim] = [publish_target] if publish_target
 
   begin
     hyacinth_search_response = RestClient::Request.execute(
