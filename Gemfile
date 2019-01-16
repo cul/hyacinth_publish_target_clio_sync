@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
-# Specify minimum ruby version for this script
-ruby ">= 2.3.0"
+ruby '2.3.4'
 
 # Specify gem dependencies
 gem 'rest-client', '~> 2.0'

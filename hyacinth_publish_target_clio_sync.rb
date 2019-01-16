@@ -11,8 +11,6 @@ require 'json'
 require 'getoptlong'
 require 'marc'
 
-puts "required file"
-
 module HyacinthPublishTargetClioSync
   # @param clio_id [String] the CLIO id to fetch as a MARC record
   # @param sleep_duration [Numeric] seconds to sleep, will skip if negative
@@ -39,7 +37,11 @@ module HyacinthPublishTargetClioSync
       publish_target_data: {}
     }
     # Summary/Description processing
-    summary = marc_record['520']['a']
+    summary = begin
+      marc_record.fields('520').map do |field|
+        field['a']
+      end.join("\n\n")
+    end
     if summary
       # TODO: Later, we'll be updating the short_description field only, and using
       # the full_description field as an extension of the short one (and probably
