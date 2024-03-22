@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '2.3.4'
+ruby '3.2.2'
 
 # Specify gem dependencies
 gem 'rest-client', '~> 2.0'

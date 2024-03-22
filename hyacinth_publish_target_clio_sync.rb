@@ -16,12 +16,13 @@ module HyacinthPublishTargetClioSync
   # @param sleep_duration [Numeric] seconds to sleep, will skip if negative
   # @raise [RestClient::ExceptionWithResponse] if there is a CLIO error
   # @return [MARC::Record]
-  def fetch_marc(clio_id, sleep_duration = 0.5)
+  def fetch_marc(voyager_query_api_key, clio_id, sleep_duration = 0.5)
     marc_data_response = RestClient::Request.execute(
       method: :get,
       max_redirects: 0, # Don't automatically follow redirects
-      url: "https://clio.columbia.edu/catalog/#{clio_id}.marc",
-      timeout: 120
+      url: "https://voyager-query.library.columbia.edu/api/v1/records/#{clio_id}/record.marc",
+      timeout: 120,
+      headers: { Authorization: "Bearer #{voyager_query_api_key}" }
     )
     # Need to sleep after each request to CLIO, otherwise CLIO may return a '429 Too Many Requests' response
     sleep sleep_duration unless sleep_duration < 0
@@ -214,7 +215,7 @@ if __FILE__ == $PROGRAM_NAME
 
   config_file_path = File.join(__dir__, 'config.yml')
 
-  unless File.exists?(config_file_path)
+  unless File.exist?(config_file_path)
     puts 'Error: Missing required config file: config.yml'
     exit
   end
@@ -287,7 +288,7 @@ if __FILE__ == $PROGRAM_NAME
 
     puts "--- Processing #{pid} (CLIO ID: #{clio_id}) ---" if debug
     begin
-      marc_record = fetch_marc(clio_id, pids_to_clio_ids_to_sync.length > 1 ? 0.5 : -1)
+      marc_record = fetch_marc(config['voyager_query_api_key'], clio_id, pids_to_clio_ids_to_sync.length > 1 ? 0.5 : -1)
     rescue RestClient::ExceptionWithResponse => err
       puts "Error: Received response '#{err.message}' for CLIO record MARC21 request. CLIO ID: #{clio_id}, Hyacinth pid: #{pid}"
       next
